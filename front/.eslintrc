@@ -13,5 +13,7 @@
   },
   "extends": [ "eslint:recommended", "plugin:react/recommended" ],
   "plugins": [ "import", "react-hooks" ],
-  "rules": {}
+  "rules": {
+    "no-unused-vars": "warn"
+  }
 }
