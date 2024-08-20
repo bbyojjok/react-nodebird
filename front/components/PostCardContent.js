@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Link from 'next/link';
 
 const PostCardContent = ({ postData }) => {
-  console.log(postData.split(/(#[^\s#]+)/g));
+  // console.log(postData.split(/(#[^\s#]+)/g));
 
   return (
     <div>
