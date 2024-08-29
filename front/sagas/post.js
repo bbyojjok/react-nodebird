@@ -111,7 +111,7 @@ function* addComment(action) {
 }
 
 function* watchLoadPost() {
-  yield throttle(3000, LOAD_POST_REQUEST, loadPost);
+  yield takeLatest(LOAD_POST_REQUEST, loadPost);
 }
 
 function* watchAddPost() {

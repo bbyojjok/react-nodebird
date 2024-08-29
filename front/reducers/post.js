@@ -2,8 +2,6 @@ import { nanoid } from 'nanoid';
 import { produce } from 'immer';
 import { faker } from '@faker-js/faker';
 
-faker.seed(123);
-
 export const initialState = {
   mainPosts: [
     // {
@@ -56,8 +54,9 @@ export const initialState = {
   addCommentError: null,
 };
 
-export const generateDummyPost = (number) =>
-  Array(number)
+export const generateDummyPost = (number) => {
+  faker.seed(123);
+  return Array(number)
     .fill()
     .map(() => ({
       id: nanoid(),
@@ -81,6 +80,7 @@ export const generateDummyPost = (number) =>
         },
       ],
     }));
+};
 
 export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
 export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
