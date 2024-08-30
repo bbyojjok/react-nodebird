@@ -15,7 +15,7 @@ const ErrorMessage = styled.div`
 const Signup = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
+  const { me, signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -52,6 +52,12 @@ const Signup = () => {
       data: { email, password, nickname },
     });
   }, [email, nickname, password, passwordCheck, term]);
+
+  useEffect(() => {
+    if (me && me.id) {
+      router.replace('/');
+    }
+  }, [me && me.id]);
 
   useEffect(() => {
     if (signUpDone) {
