@@ -16,7 +16,30 @@ import {
   UNFOLLOW_REQUEST,
   UNFOLLOW_SUCCESS,
   UNFOLLOW_FAILURE,
+  LOAD_MY_INFO_REQUEST,
+  LOAD_MY_INFO_SUCCESS,
+  LOAD_MY_INFO_FAILURE,
 } from '../reducers/user';
+
+function loadUserAPI() {
+  return axios.get('/user');
+}
+
+function* loadUser(action) {
+  try {
+    const result = yield call(loadUserAPI);
+    yield put({
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_MY_INFO_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
 function logInAPI(data) {
   return axios.post('/user/logIn', data);
@@ -30,6 +53,7 @@ function* logIn(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: LOG_IN_FAILURE,
       error: err.response.data,
@@ -48,6 +72,7 @@ function* logOut() {
       type: LOG_OUT_SUCCESS,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: LOG_OUT_FAILURE,
       error: err.response.data,
@@ -66,6 +91,7 @@ function* signUp(action) {
       type: SIGN_UP_SUCCESS,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: SIGN_UP_FAILURE,
       error: err.response.data,
@@ -86,6 +112,7 @@ function* follow(action) {
       data: action.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: FOLLOW_FAILURE,
       error: err.response.data,
@@ -106,11 +133,16 @@ function* unFollow(action) {
       data: action.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: UNFOLLOW_FAILURE,
       error: err.response.data,
     });
   }
+}
+
+function* watchLoadUser() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadUser);
 }
 
 function* watchLogin() {
@@ -135,6 +167,7 @@ function* watchUnFollow() {
 
 export default function* userSaga() {
   yield all([
+    fork(watchLoadUser),
     fork(watchLogin),
     fork(watchLogOut),
     fork(watchSignUp),

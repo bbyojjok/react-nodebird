@@ -3,16 +3,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
-import { LOAD_POST_REQUEST } from '../reducers/post';
+import { LOAD_POSTS_REQUEST } from '../reducers/post';
+import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 
 const Home = () => {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePost, loadPostLoading } = useSelector((state) => state.post);
+  const { mainPosts, hasMorePost, loadPostsLoading } = useSelector((state) => state.post);
 
   useEffect(() => {
-    dispatch({ type: LOAD_POST_REQUEST });
+    dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
   }, []);
+
+  useEffect(() => {
+    if (mainPosts.length <= 0) {
+      dispatch({ type: LOAD_POSTS_REQUEST });
+    }
+  }, [mainPosts]);
 
   useEffect(() => {
     function onScroll() {
@@ -20,8 +29,8 @@ const Home = () => {
         window.scrollY + document.documentElement.clientHeight >
         document.documentElement.scrollHeight - 300
       ) {
-        if (hasMorePost && !loadPostLoading) {
-          dispatch({ type: LOAD_POST_REQUEST });
+        if (hasMorePost && !loadPostsLoading) {
+          dispatch({ type: LOAD_POSTS_REQUEST });
         }
       }
     }
@@ -29,7 +38,7 @@ const Home = () => {
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, [hasMorePost, loadPostLoading]);
+  }, [hasMorePost, loadPostsLoading]);
 
   return (
     <AppLayout>
