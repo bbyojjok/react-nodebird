@@ -28,7 +28,7 @@ app.use('/', express.static(path.join(__dirname, 'uploads')));
 app.use(morgan('dev'));
 app.use(
   cors({
-    origin: true,
+    origin: 'http://localhost:3060',
     credentials: true,
   }),
 );

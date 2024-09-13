@@ -38,6 +38,39 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/:userId', async (req, res, next) => {
+  try {
+    const { userId: id } = req.params;
+    const fullUserWithoutPassword = await User.findOne({
+      where: { id },
+      attributes: {
+        exclude: ['password'],
+      },
+      include: [
+        { model: Post, attributes: ['id'] },
+        {
+          model: User,
+          as: 'Followings',
+          attributes: ['id'],
+        },
+        {
+          model: User,
+          as: 'Followers',
+          attributes: ['id'],
+        },
+      ],
+    });
+    if (fullUserWithoutPassword) {
+      return res.status(200).json(fullUserWithoutPassword);
+    } else {
+      return res.status(404).send('존재하지 않는 유저입니다.');
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 router.post('/login', isNotLoggedIn, (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) {
