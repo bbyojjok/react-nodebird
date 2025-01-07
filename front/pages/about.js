@@ -10,40 +10,43 @@ import AppLayout from '../components/AppLayout';
 const About = () => {
   const { userInfo } = useSelector((state) => state.user);
 
+  console.log(userInfo);
   return (
-    <AppLayout>
+    <>
       <Head>
         <meta charSet="utf-8" />
         <title>stlee | Nodebird</title>
       </Head>
-      {userInfo ? (
-        <Card
-          actions={[
-            <div key="twit">
-              짹짹
-              <br />
-              {userInfo.Posts.length}
-            </div>,
-            <div key="followings">
-              팔로잉
-              <br />
-              {userInfo.Followings.length}
-            </div>,
-            <div key="follow">
-              팔로워
-              <br />
-              {userInfo.Followers.length}
-            </div>,
-          ]}
-        >
-          <Card.Meta
-            avatar={<Avatar>{userInfo.nickname[0]}</Avatar>}
-            title={userInfo.nickname}
-            description="노드버드 매니아"
-          />
-        </Card>
-      ) : null}
-    </AppLayout>
+      <AppLayout>
+        {userInfo ? (
+          <Card
+            actions={[
+              <div key="twit">
+                짹짹
+                <br />
+                {userInfo.Posts.length}
+              </div>,
+              <div key="followings">
+                팔로잉
+                <br />
+                {userInfo.Followings.length}
+              </div>,
+              <div key="follow">
+                팔로워
+                <br />
+                {userInfo.Followers.length}
+              </div>,
+            ]}
+          >
+            <Card.Meta
+              avatar={<Avatar>{userInfo.nickname[0]}</Avatar>}
+              title={userInfo.nickname}
+              description="노드버드 매니아"
+            />
+          </Card>
+        ) : null}
+      </AppLayout>
+    </>
   );
 };
 

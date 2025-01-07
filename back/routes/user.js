@@ -1,8 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { User, Post } = require('../models');
+const { User, Post, Comment, Image } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+const { Op } = require('sequelize');
 
 const router = express.Router();
 
@@ -38,6 +39,38 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/followers', isLoggedIn, async (req, res, next) => {
+  try {
+    const user = await User.findOne({ where: { id: req.user.id } });
+    if (!user) {
+      return res.status(403).send('존재하지 않는 아이디입니다.');
+    }
+    const followers = await user.getFollowers({
+      limit: parseInt(req.query.limit, 10),
+    });
+    return res.status(200).json(followers);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.get('/followings', isLoggedIn, async (req, res, next) => {
+  try {
+    const user = await User.findOne({ where: { id: req.user.id } });
+    if (!user) {
+      return res.status(403).send('존재하지 않는 아이디입니다.');
+    }
+    const followings = await user.getFollowings({
+      limit: parseInt(req.query.limit, 10),
+    });
+    return res.status(200).json(followings);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 router.get('/:userId', async (req, res, next) => {
   try {
     const { userId: id } = req.params;
@@ -65,6 +98,51 @@ router.get('/:userId', async (req, res, next) => {
     } else {
       return res.status(404).send('존재하지 않는 유저입니다.');
     }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.get('/:userId/posts', async (req, res, next) => {
+  // GET /user/1/posts
+  try {
+    const where = { UserId: req.params.userId };
+    const lastId = parseInt(req.query.lastId, 10);
+    if (lastId) {
+      where.id = { [Op.lt]: lastId };
+    }
+    const posts = await Post.findAll({
+      where,
+      limit: 10, // offset: 0, // 0 ~ 10 개
+      order: [
+        ['createdAt', 'DESC'],
+        [Comment, 'id', 'DESC'],
+      ],
+      include: [
+        { model: User, attributes: ['id', 'nickname'] },
+        { model: Image },
+        {
+          model: Comment,
+          include: [{ model: User, attributes: ['id', 'nickname'] }],
+        },
+        { model: User, as: 'Likers', attributes: ['id'] },
+        {
+          model: Post,
+          as: 'Retweet',
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+      ],
+    });
+    return res.status(200).json(posts);
   } catch (error) {
     console.error(error);
     next(error);
@@ -202,34 +280,6 @@ router.delete('/follower/:userId', isLoggedIn, async (req, res, next) => {
     }
     await user.removeFollowings(req.user.id);
     return res.status(200).json({ UserId: parseInt(UserId, 10) });
-  } catch (error) {
-    console.error(error);
-    next(error);
-  }
-});
-
-router.get('/followers', isLoggedIn, async (req, res, next) => {
-  try {
-    const user = await User.findOne({ where: { id: req.user.id } });
-    if (!user) {
-      return res.status(403).send('존재하지 않는 아이디입니다.');
-    }
-    const followers = await user.getFollowers();
-    return res.status(200).json(followers);
-  } catch (error) {
-    console.error(error);
-    next(error);
-  }
-});
-
-router.get('/followings', isLoggedIn, async (req, res, next) => {
-  try {
-    const user = await User.findOne({ where: { id: req.user.id } });
-    if (!user) {
-      return res.status(403).send('존재하지 않는 아이디입니다.');
-    }
-    const followings = await user.getFollowings();
-    return res.status(200).json(followings);
   } catch (error) {
     console.error(error);
     next(error);

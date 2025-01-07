@@ -27,7 +27,7 @@ const configureStore = () => {
 };
 
 const wrapper = createWrapper(configureStore, {
-  debug: false, //process.env.NODE_ENV === 'development',
+  debug: false, // process.env.NODE_ENV === 'development',
 });
 
 export default wrapper;
